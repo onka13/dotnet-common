@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.4.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+	<PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetCommon.Data.EntityFrameworkBase\DotNetCommon.Data.EntityFrameworkBase.csproj" />
+    <ProjectReference Include="..\DotNetCommon.Infrastructure\DotNetCommon.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

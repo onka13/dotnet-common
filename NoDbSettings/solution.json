@@ -1,0 +1,69 @@
+{
+  "Projects": [
+    {
+      "Name": "DotNetCommon.Infra",
+      "Path": "DotNetCommon.Infra",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.Data.EntityFrameworkBase",
+      "Path": "DotNetCommon.Data.EntityFrameworkBase",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.Data.Domain",
+      "Path": "DotNetCommon.Data.Domain",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.Data.ElasticSearch",
+      "Path": "DotNetCommon.Data.ElasticSearch",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.Business.Service",
+      "Path": "DotNetCommon.Business.Service",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.Application.API",
+      "Path": "DotNetCommon.Application.API",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.Data.RabbitMQ",
+      "Path": "DotNetCommon.Data.RabbitMQ",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.Data.ServiceBus",
+      "Path": "DotNetCommon.Data.ServiceBus",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.Data.MongoDBBase",
+      "Path": "DotNetCommon.Data.MongoDBBase",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.AmazonBusiness",
+      "Path": "DotNetCommon.AmazonBusiness",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.ImageBusiness",
+      "Path": "DotNetCommon.ImageBusiness",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.ModuleBase",
+      "Path": "DotNetCommon.ModuleBase",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.VSExtensionLib",
+      "Path": "DotNetCommon.VSExtensionLib",
+      "IsSelected": false
+    }
+  ]
+}
