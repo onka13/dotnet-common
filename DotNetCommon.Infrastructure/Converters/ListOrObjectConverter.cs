@@ -3,31 +3,30 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DotNetCommon.Infrastructure.Converters
+namespace DotNetCommon.Infrastructure.Converters;
+
+public class ListOrObjectConverter<T> : JsonConverter
 {
-    public class ListOrObjectConverter<T> : JsonConverter
+    public override bool CanWrite => false;
+
+    public override bool CanConvert(Type objectType)
     {
-        public override bool CanWrite => false;
+        return objectType == typeof(List<T>);
+    }
 
-        public override bool CanConvert(Type objectType)
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        JToken token = JToken.Load(reader);
+        if (token.Type == JTokenType.Array)
         {
-            return objectType == typeof(List<T>);
+            return token.ToObject<List<T>>();
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            JToken token = JToken.Load(reader);
-            if (token.Type == JTokenType.Array)
-            {
-                return token.ToObject<List<T>>();
-            }
+        return new List<T> { token.ToObject<T>() };
+    }
 
-            return new List<T> { token.ToObject<T>() };
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,8 +1,8 @@
-﻿namespace DotNetCommon.ImageBusiness.Models
+﻿namespace DotNetCommon.ImageBusiness.Models;
+
+public class ImageInfo
 {
-    public class ImageInfo
-    {
-        public int Width { get; set; }
-        public int Height { get; set; }
-    }
+    public int Width { get; set; }
+
+    public int Height { get; set; }
 }

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using EnvDTE;
 using EnvDTE80;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Configuration;
 using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
 
 namespace CoreTemplateExtensionLibrary.Components
 {
@@ -18,7 +16,7 @@ namespace CoreTemplateExtensionLibrary.Components
         private static List<SolutionFolder> allFolders;
         static string vsProjectKindSolutionFolder = "{66A26720-8FB5-11D2-AA7E-00C04F688DDE}";
 
-        public static void SetDTE(EnvDTE.DTE dte)
+        public static void SetDTE(DTE dte)
         {
             _dteObj = dte;
         }
@@ -38,12 +36,13 @@ namespace CoreTemplateExtensionLibrary.Components
         {
             foreach (Project project in IterateCustomProjects())
             {
-                //Console.WriteLine(project.Name + " " + project.FileName);
+                // Console.WriteLine(project.Name + " " + project.FileName);
                 if (project.Name == projectName)
                 {
                     return project;
                 }
             }
+
             return null;
         }
 
@@ -53,6 +52,7 @@ namespace CoreTemplateExtensionLibrary.Components
             {
                 return allProjects.ToArray();
             }
+
             allProjects = GetAllProjects();
 
             return allProjects.ToArray();
@@ -69,7 +69,9 @@ namespace CoreTemplateExtensionLibrary.Components
                     {
                         var items = IterateCustomProjects(item.ProjectItems);
                         if (items.Count() > 0)
+                        {
                             projects.AddRange(items);
+                        }
                     }
                     else
                     {
@@ -84,6 +86,7 @@ namespace CoreTemplateExtensionLibrary.Components
             {
                 Console.WriteLine("hata:" + ex.Message);
             }
+
             return projects.ToArray();
         }
 
@@ -92,7 +95,9 @@ namespace CoreTemplateExtensionLibrary.Components
             List<ProjectItem> response = new List<ProjectItem>();
 
             if (projectItems == null)
+            {
                 return null;
+            }
 
             foreach (ProjectItem projectItem in projectItems)
             {
@@ -120,6 +125,7 @@ namespace CoreTemplateExtensionLibrary.Components
                     items.Add(myClass);
                 }
             }
+
             return items;
         }
 
@@ -130,6 +136,7 @@ namespace CoreTemplateExtensionLibrary.Components
             {
                 return null;
             }
+
             foreach (CodeElement element in item.FileCodeModel.CodeElements)
             {
                 var codeElement = GetCodeElement(element, type, itemName);
@@ -138,6 +145,7 @@ namespace CoreTemplateExtensionLibrary.Components
                     return codeElement;
                 }
             }
+
             return null;
         }
 
@@ -147,7 +155,8 @@ namespace CoreTemplateExtensionLibrary.Components
             {
                 return null;
             }
-            if (codeElement.Kind == type && codeElement.Name == itemName.Replace(".cs", ""))
+
+            if (codeElement.Kind == type && codeElement.Name == itemName.Replace(".cs", string.Empty))
             {
                 return codeElement;
             }
@@ -180,6 +189,7 @@ namespace CoreTemplateExtensionLibrary.Components
                     }
                 }
             }
+
             return null;
         }
 
@@ -193,10 +203,14 @@ namespace CoreTemplateExtensionLibrary.Components
             }
 
             if (!Path.HasExtension(fileName))
+            {
                 fileName += ".cs";
+            }
 
             if (dontOverride && File.Exists(folderPath + "\\" + fileName))
+            {
                 return;
+            }
 
             File.WriteAllText(folderPath + "\\" + fileName, output, System.Text.Encoding.UTF8);
         }
@@ -217,10 +231,14 @@ namespace CoreTemplateExtensionLibrary.Components
             }
 
             if (!Path.HasExtension(fileName))
+            {
                 fileName += ".cs";
+            }
 
             if (dontOverride && File.Exists(folderPath + "\\" + fileName))
+            {
                 return;
+            }
 
             File.WriteAllText(folderPath + "\\" + fileName, output, System.Text.Encoding.UTF8);
 
@@ -232,8 +250,11 @@ namespace CoreTemplateExtensionLibrary.Components
             foreach (ProjectItem item in project?.ProjectItems)
             {
                 if (Regex.IsMatch(item.Name, "(app|web).config", RegexOptions.IgnoreCase))
+                {
                     return item.get_FileNames(0);
+                }
             }
+
             return null;
         }
 
@@ -242,8 +263,11 @@ namespace CoreTemplateExtensionLibrary.Components
             foreach (ProjectItem item in project?.ProjectItems)
             {
                 if (Regex.IsMatch(item.Name, "(appsettings|settings).json", RegexOptions.IgnoreCase))
+                {
                     return item.get_FileNames(0);
+                }
             }
+
             return null;
         }
 
@@ -254,7 +278,9 @@ namespace CoreTemplateExtensionLibrary.Components
             var configFilePath = FindConfigJsonFile(project);
 
             if (configFilePath == null)
+            {
                 return null;
+            }
 
             var json = File.ReadAllText(configFilePath);
 
@@ -293,6 +319,7 @@ namespace CoreTemplateExtensionLibrary.Components
                     {
                         continue;
                     }
+
                     list.Add(project);
                 }
             }
@@ -321,13 +348,17 @@ namespace CoreTemplateExtensionLibrary.Components
                     list.Add(subProject);
                 }
             }
+
             return list;
         }
 
         public static IList<SolutionFolder> GetAllProjectSolutionFolders()
         {
             if (allFolders != null)
+            {
                 return allFolders;
+            }
+
             allFolders = new List<SolutionFolder>();
             foreach (Project childProject in GetSolution().Projects)
             {
@@ -339,7 +370,10 @@ namespace CoreTemplateExtensionLibrary.Components
 
                         allFolders.Add(solutionFolder);
                         var subList = GetSolutionFolders(childProject);
-                        if (subList.Count() > 0) allFolders.AddRange(subList);
+                        if (subList.Count() > 0)
+                        {
+                            allFolders.AddRange(subList);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -352,7 +386,11 @@ namespace CoreTemplateExtensionLibrary.Components
 
         public static SolutionFolder GetSolutionFolder(string folderName)
         {
-            if (string.IsNullOrEmpty(folderName)) return null;
+            if (string.IsNullOrEmpty(folderName))
+            {
+                return null;
+            }
+
             return GetAllProjectSolutionFolders().FirstOrDefault(x => x.Parent.Name == folderName);
         }
 
@@ -372,9 +410,13 @@ namespace CoreTemplateExtensionLibrary.Components
                     var solutionFolder = (SolutionFolder)subProject.Object;
                     list.Add(solutionFolder);
                     var subList = GetSolutionFolders(subProject);
-                    if (subList.Count() > 0) list.AddRange(subList);
+                    if (subList.Count() > 0)
+                    {
+                        list.AddRange(subList);
+                    }
                 }
             }
+
             return list;
         }
     }

@@ -1,14 +1,13 @@
 ﻿using Xunit;
 
-namespace DotNetCommon.Application.APIBase.TestComponents
+namespace DotNetCommon.Application.APIBase.TestComponents;
+
+public class FactDebugOnlyAttribute : FactAttribute
 {
-    public class FactDebugOnlyAttribute : FactAttribute
+    public FactDebugOnlyAttribute()
     {
-        public FactDebugOnlyAttribute()
-        {
 #if !DEBUG
-            Skip = "Only running in debug mode.";
+        Skip = "Only running in debug mode.";
 #endif
-        }
     }
 }

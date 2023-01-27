@@ -1,30 +1,29 @@
 ﻿using System;
 using System.Globalization;
 
-namespace DotNetCommon.Infrastructure.Helpers
+namespace DotNetCommon.Infrastructure.Helpers;
+
+public static class AltairHelper
 {
-    public static class AltairHelper
+    public static bool ParseBoolean(string value)
     {
-        public static bool ParseBoolean(string value)
-        {
-            return value == "X" || value == "x" ? true : false;
-        }
+        return value == "X" || value == "x" ? true : false;
+    }
 
-        public static double ConvertToDouble(string value)
-        {
-            return Convert.ToDouble(value, new CultureInfo("en-GB"));
-        }
+    public static double ConvertToDouble(string value)
+    {
+        return Convert.ToDouble(value, new CultureInfo("en-GB"));
+    }
 
-        public static string ConvertDurationUnitFromAltairTOClarizen(string altairUnit)
+    public static string ConvertDurationUnitFromAltairTOClarizen(string altairUnit)
+    {
+        // TODO: Add all the cases
+        switch (altairUnit)
         {
-            // TODO: Add all the cases
-            switch (altairUnit)
-            {
-                case "H":
-                    return "Hours";
-                default:
-                    return string.Empty;
-            }
+            case "H":
+                return "Hours";
+            default:
+                return string.Empty;
         }
     }
 }

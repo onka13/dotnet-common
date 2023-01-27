@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using EnvDTE;
 using EnvDTE80;
-
 
 namespace DotNetCommon.VSExtensionLib.Components
 {
@@ -13,7 +10,6 @@ namespace DotNetCommon.VSExtensionLib.Components
 
         public VsSolution()
         {
-
         }
 
         #region " DTE - Solution"
@@ -21,7 +17,7 @@ namespace DotNetCommon.VSExtensionLib.Components
         public void CreateDte()
         {
             Type t = Type.GetTypeFromProgID("VisualStudio.DTE.16.0", true);
-            _dteObj = (EnvDTE80.DTE2)Activator.CreateInstance(t, true);
+            _dteObj = (DTE2)Activator.CreateInstance(t, true);
 
             // Register the IOleMessageFilter to handle any threading 
             // errors.
@@ -46,7 +42,7 @@ namespace DotNetCommon.VSExtensionLib.Components
         public void CloseSolution()
         {
             _dteObj.Quit();
-        } 
+        }
 
         #endregion
 

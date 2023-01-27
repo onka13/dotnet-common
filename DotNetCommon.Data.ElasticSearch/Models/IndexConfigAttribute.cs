@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace DotNetCommon.Data.ElasticSearch.Base
+namespace DotNetCommon.Data.ElasticSearch.Base;
+
+public class IndexConfigAttribute : Attribute
 {
-    public class IndexConfigAttribute : Attribute
+    public IndexConfigAttribute(string name)
     {
-        public string Name { get; set; }
-
-        public IndexConfigAttribute(string name)
-        {
-            Name = name;
-        }
+        Name = name;
     }
+
+    public string Name { get; set; }
 }

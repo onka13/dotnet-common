@@ -1,60 +1,59 @@
-﻿using Autofac;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
+using Autofac;
 
-namespace DotNetCommon.Business.Service.Helpers
+namespace DotNetCommon.Business.Service.Helpers;
+
+/// <summary>
+/// Dependency helper
+/// </summary>
+public class DependencyHelper
 {
     /// <summary>
-    /// Dependency helper
+    /// Register common types
     /// </summary>
-    public class DependencyHelper
+    /// <param name="builder"></param>
+    /// <param name="types"></param>
+    public static void RegisterCommonTypes(ContainerBuilder builder, params Type[] types)
     {
-        /// <summary>
-        /// Register common types
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="types"></param>
-        public static void RegisterCommonTypes(ContainerBuilder builder, params Type[] types)
+        var assemblies = types.Select(x => x.GetTypeInfo().Assembly);
+        RegisterCommonTypes(builder, assemblies.ToArray());
+    }
+
+    /// <summary>
+    /// Register common types in assemblies.
+    /// Controller, Manager, Filter => asSelf
+    /// Repository, BusinessLogic => asImplementedInterfaces
+    /// DbContext => asSelf
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="assemblies"></param>
+    public static void RegisterCommonTypes(ContainerBuilder builder, params Assembly[] assemblies)
+    {
+        foreach (var assembly in assemblies)
         {
-            var assemblies = types.Select(x => x.GetTypeInfo().Assembly);
-            RegisterCommonTypes(builder, assemblies.ToArray());
-        }
+            builder.RegisterAssemblyTypes(assembly)
+                .Where(t => t.Name.EndsWith("Controller") || t.Name.EndsWith("Manager") || t.Name.EndsWith("Filter"))
+                .AsSelf()
+                .PropertiesAutowired();
 
-        /// <summary>
-        /// Register common types in assemblies.
-        /// Controller, Manager, Filter => asSelf
-        /// Repository, BusinessLogic => asImplementedInterfaces
-        /// DbContext => asSelf
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="assemblies"></param>
-        public static void RegisterCommonTypes(ContainerBuilder builder, params Assembly[] assemblies)
-        {
-            foreach (var assembly in assemblies)
-            {
-                builder.RegisterAssemblyTypes(assembly)
-                    .Where(t => t.Name.EndsWith("Controller") || t.Name.EndsWith("Manager") || t.Name.EndsWith("Filter"))
-                    .AsSelf()
-                    .PropertiesAutowired();
+            builder.RegisterAssemblyTypes(assembly)
+                .Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("BusinessLogic"))
+                .AsImplementedInterfaces()
+                .PropertiesAutowired();
 
-                builder.RegisterAssemblyTypes(assembly)
-                    .Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("BusinessLogic"))
-                    .AsImplementedInterfaces()
-                    .PropertiesAutowired();
+            builder.RegisterAssemblyTypes(assembly)
+                .Where(t => t.Name.EndsWith("DbContext"))
+                .AsSelf()
+                .PropertiesAutowired()
+                .InstancePerDependency();
 
-                builder.RegisterAssemblyTypes(assembly)
-                    .Where(t => t.Name.EndsWith("DbContext"))
-                    .AsSelf()
-                    .PropertiesAutowired()
-                    .InstancePerDependency(); 
-                
-                builder.RegisterAssemblyTypes(assembly)
-                    .Where(t => t.Name.EndsWith("MongoContext"))
-                    .AsSelf()
-                    .PropertiesAutowired()
-                    .SingleInstance();
-            }
+            builder.RegisterAssemblyTypes(assembly)
+                .Where(t => t.Name.EndsWith("MongoContext"))
+                .AsSelf()
+                .PropertiesAutowired()
+                .SingleInstance();
         }
     }
 }

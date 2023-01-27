@@ -2,15 +2,14 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DotNetCommon.Data.Domain.Business
-{
-    /// <summary>
-    /// Module Config interface.
-    /// </summary>
-    public interface IModuleConfig
-    {
-        void ConfigureServices(IConfiguration configuration, IServiceCollection services);
+namespace DotNetCommon.Data.Domain.Business;
 
-        void ConfigureContainer(ContainerBuilder builder);
-    }
+/// <summary>
+/// Module Config interface.
+/// </summary>
+public interface IModuleConfig
+{
+    void ConfigureServices(IConfiguration configuration, IServiceCollection services);
+
+    void ConfigureContainer(ContainerBuilder builder);
 }

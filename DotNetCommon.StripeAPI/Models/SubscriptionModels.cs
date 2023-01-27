@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
+﻿namespace DotNetCommon.StripeAPI.Models;
 
-namespace DotNetCommon.StripeAPI.Models
+public class SubscribeItemOption
 {
-    public class SubscribeItemOption
-    {
-        public string PriceId { get; set; }
-        public long? Quantity { get; set; }
-    }
+    public string PriceId { get; set; }
+
+    public long? Quantity { get; set; }
 }

@@ -1,20 +1,17 @@
-﻿using Amazon;
-using Amazon.S3;
-using Amazon.S3.Transfer;
-using DotNetCommon.AmazonBusiness.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using System.Linq;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using DotNetCommon.AmazonBusiness.Models;
 
 namespace DotNetCommon.AmazonBusiness.helpers;
 
 public class AmazonS3Manager
 {
     private IAmazonS3 s3Client;
-
-    public AmazonConfig Config { get; private set; }
 
     public AmazonS3Manager(AmazonConfig config)
     {
@@ -23,9 +20,11 @@ public class AmazonS3Manager
 
         s3Client = new AmazonS3Client(Config.AccessKey, Config.SecretKey, new AmazonS3Config()
         {
-            RegionEndpoint = region
+            RegionEndpoint = region,
         });
     }
+
+    public AmazonConfig Config { get; private set; }
 
     public async Task<bool> UploadFileAsync(string bucketName, string keyName, Stream stream)
     {
@@ -38,11 +37,13 @@ public class AmazonS3Manager
                 InputStream = stream,
                 BucketName = bucketName,
                 Key = keyName,
-                CannedACL = S3CannedACL.PublicRead
+                CannedACL = S3CannedACL.PublicRead,
             };
-            //fileTransferUtilityRequest.Metadata.Add("param1", "Value1");
+
+            // fileTransferUtilityRequest.Metadata.Add("param1", "Value1");
 
             await fileTransferUtility.UploadAsync(fileTransferUtilityRequest);
+
             // result string.Format("http://{0}.s3.amazonaws.com/{1}", bucketName, keyName);
             return true;
         }
@@ -54,7 +55,7 @@ public class AmazonS3Manager
         catch (Exception e)
         {
             Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
-            throw e;
+            throw;
         }
     }
 

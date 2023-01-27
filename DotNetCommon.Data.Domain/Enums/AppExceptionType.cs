@@ -1,9 +1,8 @@
-﻿namespace DotNetCommon.Data.Domain.Enums
+﻿namespace DotNetCommon.Data.Domain.Enums;
+
+public enum AppExceptionType : byte
 {
-    public enum AppExceptionType : byte
-    {
-        Info = 0,
-        Warning,
-        Error,
-    }
+    Info = 0,
+    Warning,
+    Error,
 }

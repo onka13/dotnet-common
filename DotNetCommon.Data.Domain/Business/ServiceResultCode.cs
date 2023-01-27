@@ -1,19 +1,18 @@
-﻿namespace DotNetCommon.Data.Domain.Business
+﻿namespace DotNetCommon.Data.Domain.Business;
+
+/// <summary>
+/// Base service result codes.
+/// </summary>
+public class ServiceResultCode
 {
-    /// <summary>
-    /// Base service result codes.
-    /// </summary>
-    public class ServiceResultCode
-    {
-        public const int Created = 12;
-        public const int Updated = 11;
-        public const int Deleted = 10;
-        public const int Error = 0;
-        public const int ServerError = -1;
-        public const int NoPermission = -2;
-        public const int EmptyModel = -10;
-        public const int InvalidModel = -11;
-        public const int NotFound = -12;
-        public const int NoRowsAffected = -30;
-    }
+    public const int Created = 12;
+    public const int Updated = 11;
+    public const int Deleted = 10;
+    public const int Error = 0;
+    public const int ServerError = -1;
+    public const int NoPermission = -2;
+    public const int EmptyModel = -10;
+    public const int InvalidModel = -11;
+    public const int NotFound = -12;
+    public const int NoRowsAffected = -30;
 }

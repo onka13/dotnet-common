@@ -1,16 +1,19 @@
 ﻿using System.Collections.Generic;
 
-namespace DotNetCommon.Data.RabbitMQ.Models
+namespace DotNetCommon.Data.RabbitMQ.Models;
+
+/// <summary>
+/// Queue Declare Model
+/// </summary>
+public class QueueDeclareModel
 {
-    /// <summary>
-    /// Queue Declare Model
-    /// </summary>
-    public class QueueDeclareModel
-    {
-        public string Queue { get; set; }
-        public bool Durable { get; set; }
-        public bool Exclusive { get; set; }
-        public bool AutoDelete { get; set; }
-        public IDictionary<string, object> Arguments { get; set; }
-    }
+    public string Queue { get; set; }
+
+    public bool Durable { get; set; }
+
+    public bool Exclusive { get; set; }
+
+    public bool AutoDelete { get; set; }
+
+    public IDictionary<string, object> Arguments { get; set; }
 }

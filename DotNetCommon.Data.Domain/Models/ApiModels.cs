@@ -1,44 +1,43 @@
 ﻿using System.Collections.Generic;
 
-namespace DotNetCommon.Data.Domain.Models
+namespace DotNetCommon.Data.Domain.Models;
+
+public class IdModel
 {
-    public class IdModel
+    public int Id { get; set; }
+}
+
+public class ApiRequestListModel<T>
+{
+    public ApiRequestListModel()
     {
-        public int Id { get; set; }
+        Pagination = new Pagination { Page = 1, PerPage = 30 };
+        Sort = new Sort();
+        Filter = default;
     }
 
-    public class ApiRequestListModel<T>
-    {
-        public ApiRequestListModel()
-        {
-            Pagination = new Pagination { Page = 1, PerPage = 30 };
-            Sort = new Sort();
-            Filter = default;
-        }
+    public Pagination Pagination { get; set; }
 
-        public Pagination Pagination { get; set; }
+    public Sort Sort { get; set; }
 
-        public Sort Sort { get; set; }
+    public T Filter { get; set; }
+}
 
-        public T Filter { get; set; }
-    }
+public class Pagination
+{
+    public int Page { get; set; }
 
-    public class Pagination
-    {
-        public int Page { get; set; }
+    public int PerPage { get; set; }
+}
 
-        public int PerPage { get; set; }
-    }
+public class Sort
+{
+    public string Field { get; set; }
 
-    public class Sort
-    {
-        public string Field { get; set; }
+    public string Order { get; set; }
+}
 
-        public string Order { get; set; }
-    }
-
-    public class ArrayRequest<T>
-    {
-        public List<T> Ids { get; set; }
-    }
+public class ArrayRequest<T>
+{
+    public List<T> Ids { get; set; }
 }

@@ -1,151 +1,170 @@
-﻿using DotNetCommon.Data.RabbitMQ.Models;
+﻿using System;
+using System.Collections.Generic;
+using DotNetCommon.Data.RabbitMQ.Models;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace DotNetCommon.Data.RabbitMQ.Helpers
+namespace DotNetCommon.Data.RabbitMQ.Helpers;
+
+/// <summary>
+/// Helper class for RabbitMQ
+/// </summary>
+public class RabbitMQHelper
 {
+    private readonly ConnectionFactory factory;
+
     /// <summary>
-    /// Helper class for RabbitMQ
+    /// Connection list already opened
     /// </summary>
-    public class RabbitMQHelper
+    private readonly Dictionary<string, IConnection> connections;
+
+    public RabbitMQHelper(string uri)
     {
-        readonly ConnectionFactory factory;
-        /// <summary>
-        /// Connection list already opened
-        /// </summary>
-        readonly Dictionary<string, IConnection> connections;
-
-        public RabbitMQHelper(string uri)
+        factory = new ConnectionFactory
         {
-            factory = new ConnectionFactory
-            {
-                Uri = new Uri(uri)
-            };
-            connections = new Dictionary<string, IConnection>();
+            Uri = new Uri(uri),
+        };
+        connections = new Dictionary<string, IConnection>();
+    }
+
+    /// <summary>
+    /// Get connection factory
+    /// </summary>
+    /// <returns></returns>
+    public ConnectionFactory GetFactory()
+    {
+        return factory;
+    }
+
+    /// <summary>
+    /// Close connection
+    /// </summary>
+    /// <param name="key">connection key</param>
+    /// <param name="reasonCode">Reason Code</param>
+    /// <param name="reasonText">Reason Text</param>
+    public void CloseConnection(string key, ushort reasonCode = 0, string reasonText = "")
+    {
+        if (!connections.ContainsKey(key))
+        {
+            return;
         }
 
-        /// <summary>
-        /// Get connection factory
-        /// </summary>
-        /// <returns></returns>
-        public ConnectionFactory GetFactory()
+        connections[key].Close(reasonCode, reasonText);
+        connections.Remove(key);
+        Console.WriteLine("RabbitMQ: Connection closed.");
+    }
+
+    /// <summary>
+    /// Declare Queueu
+    /// </summary>
+    /// <param name="channel"></param>
+    /// <param name="model"></param>
+    public void QueueDeclare(IModel channel, QueueDeclareModel model)
+    {
+        if (model == null)
         {
-            return factory;
+            return;
         }
 
-        /// <summary>
-        /// Close connection
-        /// </summary>
-        /// <param name="key">connection key</param>
-        /// <param name="reasonCode">Reason Code</param>
-        /// <param name="reasonText">Reason Text</param>
-        public void CloseConnection(string key, ushort reasonCode = 0, string reasonText = "")
+        channel.QueueDeclare(queue: model.Queue, durable: model.Durable, exclusive: model.Exclusive, autoDelete: model.AutoDelete, arguments: model.Arguments);
+    }
+
+    /// <summary>
+    /// Basic Qos
+    /// </summary>
+    /// <param name="channel"></param>
+    /// <param name="model"></param>
+    public void BasicQos(IModel channel, BasicQosModel model)
+    {
+        if (model == null)
         {
-            if (!connections.ContainsKey(key)) return;
-            connections[key].Close(reasonCode, reasonText);
-            connections.Remove(key);
-            Console.WriteLine("RabbitMQ: Connection closed.");
+            return;
         }
 
-        /// <summary>
-        /// Declare Queueu
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="model"></param>
-        public void QueueDeclare(IModel channel, QueueDeclareModel model)
+        channel.BasicQos(prefetchSize: model.PrefetchSize, prefetchCount: model.PrefetchCount, global: model.Global);
+    }
+
+    /// <summary>
+    /// Create Channel
+    /// </summary>
+    /// <param name="queue">queue name</param>
+    /// <param name="body"></param>
+    /// <param name="queueDeclare"></param>
+    public void CreateChannel(string queue, byte[] body, QueueDeclareModel queueDeclare = null)
+    {
+        using (var connection = factory.CreateConnection())
+        using (var channel = connection.CreateModel())
         {
-            if (model == null) return;
-            channel.QueueDeclare(queue: model.Queue, durable: model.Durable, exclusive: model.Exclusive, autoDelete: model.AutoDelete, arguments: model.Arguments);
-        }
-
-        /// <summary>
-        /// Basic Qos
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="model"></param>
-        public void BasicQos(IModel channel, BasicQosModel model)
-        {
-            if (model == null) return;
-            channel.BasicQos(prefetchSize: model.PrefetchSize, prefetchCount: model.PrefetchCount, global: model.Global);
-        }
-
-        /// <summary>
-        /// Create Channel
-        /// </summary>
-        /// <param name="queue">queue name</param>
-        /// <param name="body"></param>
-        /// <param name="queueDeclare"></param>
-        public void CreateChannel(string queue, byte[] body, QueueDeclareModel queueDeclare = null)
-        {
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                QueueDeclare(channel, queueDeclare);
-                channel.BasicPublish(exchange: "", routingKey: queue, basicProperties: null, body: body);
-            }
-        }
-
-        public void Send<T>(string queue, T body, QueueDeclareModel queueDeclare = null)
-        {
-            CreateChannel(queue, BinaryData.FromObjectAsJson(body).ToArray(), queueDeclare);
-        }
-
-        /// <summary>
-        /// Basic Consume
-        /// </summary>
-        /// <param name="queue"></param>
-        /// <param name="received"></param>
-        /// <param name="consume"></param>
-        /// <param name="qos"></param>
-        /// <param name="queueDeclare"></param>
-        /// <returns></returns>
-        public string BasicConsume(string queue, Func<BasicDeliverEventArgsModel, bool> received, BasicConsumeModel consume = null, BasicQosModel qos = null, QueueDeclareModel queueDeclare = null)
-        {
-            string connectionKey = Guid.NewGuid().ToString();
-
-            var connection = factory.CreateConnection();            
-            var channel = connection.CreateModel();
-
-            connections.Add(connectionKey, connection);
-
             QueueDeclare(channel, queueDeclare);
-            BasicQos(channel, qos);
+            channel.BasicPublish(exchange: string.Empty, routingKey: queue, basicProperties: null, body: body);
+        }
+    }
 
-            Console.WriteLine("RabbitMQ: Waiting for messages.");
+    public void Send<T>(string queue, T body, QueueDeclareModel queueDeclare = null)
+    {
+        CreateChannel(queue, BinaryData.FromObjectAsJson(body).ToArray(), queueDeclare);
+    }
 
-            var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, e) =>
+    /// <summary>
+    /// Basic Consume
+    /// </summary>
+    /// <param name="queue"></param>
+    /// <param name="received"></param>
+    /// <param name="consume"></param>
+    /// <param name="qos"></param>
+    /// <param name="queueDeclare"></param>
+    /// <returns></returns>
+    public string BasicConsume(string queue, Func<BasicDeliverEventArgsModel, bool> received, BasicConsumeModel consume = null, BasicQosModel qos = null, QueueDeclareModel queueDeclare = null)
+    {
+        string connectionKey = Guid.NewGuid().ToString();
+
+        var connection = factory.CreateConnection();
+        var channel = connection.CreateModel();
+
+        connections.Add(connectionKey, connection);
+
+        QueueDeclare(channel, queueDeclare);
+        BasicQos(channel, qos);
+
+        Console.WriteLine("RabbitMQ: Waiting for messages.");
+
+        var consumer = new EventingBasicConsumer(channel);
+        consumer.Received += (model, e) =>
+        {
+            var res = received(new BasicDeliverEventArgsModel
             {
-                var res = received(new BasicDeliverEventArgsModel
-                {
-                    Body = e.Body,
-                    ConsumerTag = e.ConsumerTag,
-                    DeliveryTag = e.DeliveryTag,
-                    Exchange = e.Exchange,
-                    Redelivered = e.Redelivered,
-                    RoutingKey = e.RoutingKey,
-                });
-                if (!res) return;
-                channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: qos?.PrefetchCount > 1);
-            };
-            if (consume == null) consume = new BasicConsumeModel();
-            channel.BasicConsume(queue, consume.AutoAck, consume.ConsumerTag, consume.NoLocal, consume.Exclusive, consume.Arguments, consumer);
+                Body = e.Body,
+                ConsumerTag = e.ConsumerTag,
+                DeliveryTag = e.DeliveryTag,
+                Exchange = e.Exchange,
+                Redelivered = e.Redelivered,
+                RoutingKey = e.RoutingKey,
+            });
+            if (!res)
+            {
+                return;
+            }
 
-            return connectionKey;
+            channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: qos?.PrefetchCount > 1);
+        };
+        if (consume == null)
+        {
+            consume = new BasicConsumeModel();
         }
 
-        /// <summary>
-        /// Dispose connections
-        /// </summary>
-        public void Dispose()
+        channel.BasicConsume(queue, consume.AutoAck, consume.ConsumerTag, consume.NoLocal, consume.Exclusive, consume.Arguments, consumer);
+
+        return connectionKey;
+    }
+
+    /// <summary>
+    /// Dispose connections
+    /// </summary>
+    public void Dispose()
+    {
+        foreach (var connection in connections)
         {
-            foreach (var connection in connections)
-            {
-                CloseConnection(connection.Key);
-            }
+            CloseConnection(connection.Key);
         }
     }
 }

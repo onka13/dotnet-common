@@ -1,39 +1,38 @@
-﻿using DotNetCommon.Data.Domain.Models;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using DotNetCommon.Data.Domain.Models;
 
-namespace DotNetCommon.Infrastructure.Helpers
+namespace DotNetCommon.Infrastructure.Helpers;
+
+public static class ResilienceExtensions
 {
-    public static class ResilienceExtensions
+    public static async Task Retry<TException>(this Func<Task> action, int maxTetry, Func<TException, int, Task> beforeRetry = null)
+        where TException : Exception
     {
-        public static async Task Retry<TException>(this Func<Task> action, int maxTetry, Func<TException, int, Task> beforeRetry = null)
-            where TException : Exception
+        await RetryInner(action, maxTetry, beforeRetry);
+    }
+
+    private static async Task RetryInner<TException>(Func<Task> action, int maxRetry, Func<TException, int, Task> beforeRetry = null, int retry = 1)
+        where TException : Exception
+    {
+        if (maxRetry < retry)
         {
-            await RetryInner(action, maxTetry, beforeRetry);
+            throw new AppException("Max retry exhausted. Max retry {maxRetry}", maxRetry);
         }
 
-        private static async Task RetryInner<TException>(Func<Task> action, int maxRetry, Func<TException, int, Task> beforeRetry = null, int retry = 1)
-            where TException : Exception
+        try
         {
-            if (maxRetry < retry)
+            await action();
+        }
+        catch (TException ex)
+        {
+            if (beforeRetry != null)
             {
-                throw new AppException("Max retry exhausted. Max retry {maxRetry}", maxRetry);
+                await beforeRetry(ex, retry);
             }
 
-            try
-            {
-                await action();
-            }
-            catch (TException ex)
-            {
-                if (beforeRetry != null)
-                {
-                    await beforeRetry(ex, retry);
-                }
-
-                retry++;
-                await RetryInner(action, maxRetry, beforeRetry, retry);
-            }
+            retry++;
+            await RetryInner(action, maxRetry, beforeRetry, retry);
         }
     }
 }

@@ -1,57 +1,56 @@
-﻿using DotNetCommon.Data.Domain.Business;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using DotNetCommon.Data.Domain.Business;
 
-namespace DotNetCommon.Infrastructure.Helpers
+namespace DotNetCommon.Infrastructure.Helpers;
+
+/// <summary>
+/// Contains helper methods for modules.
+/// </summary>
+public class ModuleHelper
 {
     /// <summary>
-    /// Contains helper methods for modules.
+    /// List of the defined modules.
     /// </summary>
-    public class ModuleHelper
+    private static List<IModuleConfig> moduleConfigs = new List<IModuleConfig>();
+
+    public static List<string> AssemblyPatterns { get; set; } = new List<string>
     {
-        public static List<string> AssemblyPatterns { get; set; } = new List<string>
-        {
-            "DotNetCommon*.dll",
-            "Module*.dll",
-        };
+        "DotNetCommon*.dll",
+        "Module*.dll",
+    };
 
-        /// <summary>
-        /// List of the defined modules.
-        /// </summary>
-        private static List<IModuleConfig> moduleConfigs;
+    /// <summary>
+    /// Finds all modules in the system.
+    /// </summary>
+    public static void FindModules()
+    {
+        moduleConfigs = FindAllAssemblies()
+                    .SelectMany(x => x.DefinedTypes)
+                    .Where(type => type.IsClass && typeof(IModuleConfig).GetTypeInfo().IsAssignableFrom(type.AsType()))
+                    .Select(type => (IModuleConfig)Activator.CreateInstance(type))
+                    .ToList();
+    }
 
-        /// <summary>
-        /// Finds all modules in the system.
-        /// </summary>
-        public static void FindModules()
+    /// <summary>
+    /// Gets module list.
+    /// </summary>
+    /// <returns></returns>
+    public static List<IModuleConfig> GetModules()
+    {
+        if (moduleConfigs == null)
         {
-            moduleConfigs = FindAllAssemblies()
-                        .SelectMany(x => x.DefinedTypes)
-                        .Where(type => type.IsClass && typeof(IModuleConfig).GetTypeInfo().IsAssignableFrom(type.AsType()))
-                        .Select(type => (IModuleConfig)Activator.CreateInstance(type))
-                        .ToList();
+            FindModules();
         }
 
-        /// <summary>
-        /// Gets module list.
-        /// </summary>
-        /// <returns></returns>
-        public static List<IModuleConfig> GetModules()
-        {
-            if (moduleConfigs == null)
-            {
-                FindModules();
-            }
+        return moduleConfigs;
+    }
 
-            return moduleConfigs;
-        }
-
-        public static List<Assembly> FindAllAssemblies()
-        {
-            return AssemblyPatterns.SelectMany(x => Directory.GetFiles(AppContext.BaseDirectory, x)).Distinct().Select(Assembly.LoadFrom).ToList();
-        }
+    public static List<Assembly> FindAllAssemblies()
+    {
+        return AssemblyPatterns.SelectMany(x => Directory.GetFiles(AppContext.BaseDirectory, x)).Distinct().Select(Assembly.LoadFrom).ToList();
     }
 }

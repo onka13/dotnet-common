@@ -2,37 +2,36 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
-namespace DotNetCommon.Infrastructure.Validators.DataAnnotations
+namespace DotNetCommon.Infrastructure.Validators.DataAnnotations;
+
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public class MinAttribute : DataTypeAttribute
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class MinAttribute : DataTypeAttribute
+    private readonly double min;
+
+    public MinAttribute(double min)
+        : base("min")
     {
-        private readonly double min;
+        this.min = min;
+    }
 
-        public MinAttribute(double min)
-            : base("min")
+    public override string FormatErrorMessage(string name)
+    {
+        if (ErrorMessage == null && ErrorMessageResourceName == null)
         {
-            this.min = min;
+            ErrorMessage = "The field {0} must be greater than or equal to {1}";
         }
 
-        public override string FormatErrorMessage(string name)
-        {
-            if (ErrorMessage == null && ErrorMessageResourceName == null)
-            {
-                ErrorMessage = "The field {0} must be greater than or equal to {1}";
-            }
+        return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, min);
+    }
 
-            return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, min);
+    public override bool IsValid(object value)
+    {
+        if (value == null)
+        {
+            return true;
         }
 
-        public override bool IsValid(object value)
-        {
-            if (value == null)
-            {
-                return true;
-            }
-
-            return double.TryParse(Convert.ToString(value), out double valueAsDouble) && valueAsDouble >= min;
-        }
+        return double.TryParse(Convert.ToString(value), out double valueAsDouble) && valueAsDouble >= min;
     }
 }

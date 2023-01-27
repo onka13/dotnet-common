@@ -5,7 +5,6 @@ namespace DotNetCommon.VSExtensionLib.Components
 {
     public class MessageFilter : IOleMessageFilter
     {
-        //
         // Class containing the IOleMessageFilter
         // thread error-handling functions.
 
@@ -24,20 +23,23 @@ namespace DotNetCommon.VSExtensionLib.Components
             CoRegisterMessageFilter(null, out oldFilter);
         }
 
-        //
         // IOleMessageFilter functions.
         // Handle incoming thread requests.
-        int IOleMessageFilter.HandleInComingCall(int dwCallType,
-          System.IntPtr hTaskCaller, int dwTickCount, System.IntPtr
-          lpInterfaceInfo)
+        int IOleMessageFilter.HandleInComingCall(
+            int dwCallType,
+            IntPtr hTaskCaller,
+            int dwTickCount,
+            IntPtr lpInterfaceInfo)
         {
-            //Return the flag SERVERCALL_ISHANDLED.
+            // Return the flag SERVERCALL_ISHANDLED.
             return 0;
         }
 
         // Thread call was rejected, so try again.
-        int IOleMessageFilter.RetryRejectedCall(System.IntPtr
-          hTaskCallee, int dwTickCount, int dwRejectType)
+        int IOleMessageFilter.RetryRejectedCall(
+            IntPtr hTaskCallee,
+            int dwTickCount,
+            int dwRejectType)
         {
             if (dwRejectType == 2)
             // flag = SERVERCALL_RETRYLATER.
@@ -46,14 +48,16 @@ namespace DotNetCommon.VSExtensionLib.Components
                 // <100.
                 return 99;
             }
+
             // Too busy; cancel call.
             return -1;
         }
 
-        int IOleMessageFilter.MessagePending(System.IntPtr hTaskCallee,
-          int dwTickCount, int dwPendingType)
+        int IOleMessageFilter.MessagePending(
+            IntPtr hTaskCallee,
+            int dwTickCount, int dwPendingType)
         {
-            //Return the flag PENDINGMSG_WAITDEFPROCESS.
+            // Return the flag PENDINGMSG_WAITDEFPROCESS.
             return 2;
         }
 
@@ -64,8 +68,9 @@ namespace DotNetCommon.VSExtensionLib.Components
           IOleMessageFilter oldFilter);
     }
 
-    [ComImport(), Guid("00000016-0000-0000-C000-000000000046"),
-    InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
+    [ComImport]
+    [Guid("00000016-0000-0000-C000-000000000046")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     interface IOleMessageFilter
     {
         [PreserveSig]

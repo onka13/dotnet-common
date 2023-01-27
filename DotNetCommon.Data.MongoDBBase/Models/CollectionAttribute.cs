@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace DotNetCommon.Data.MongoDBBase.Base
+namespace DotNetCommon.Data.MongoDBBase.Base;
+
+public class CollectionAttribute : Attribute
 {
-    public class CollectionAttribute : Attribute
+    public CollectionAttribute(string name)
     {
-        public string Name { get; set; }
-
-        public CollectionAttribute(string name)
-        {
-            Name = name;
-        }
+        Name = name;
     }
+
+    public string Name { get; set; }
 }

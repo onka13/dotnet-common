@@ -1,12 +1,11 @@
 ﻿using System.Linq.Expressions;
 
-namespace DotNetCommon.Infrastructure.Helpers
+namespace DotNetCommon.Infrastructure.Helpers;
+
+public static class ExpressionHelper
 {
-    public static class ExpressionHelper
+    public static Expression<TDelegate> AndAlso<TDelegate>(this Expression<TDelegate> left, Expression<TDelegate> right)
     {
-        public static Expression<TDelegate> AndAlso<TDelegate>(this Expression<TDelegate> left, Expression<TDelegate> right)
-        {
-            return Expression.Lambda<TDelegate>(Expression.AndAlso(left, right), left.Parameters);
-        }
+        return Expression.Lambda<TDelegate>(Expression.AndAlso(left, right), left.Parameters);
     }
 }

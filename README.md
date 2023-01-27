@@ -1,13 +1,13 @@
-# .NET 6 Common Projects
+# .NET 7 Common Projects
 
-C# .NET 6 projects which contains some common features and utilities.
+C# .NET 7 projects which contains some common features and utilities.
 
 ## Installation
 
 Clone or download
 
 ```bash
-git clone https://github.com/onka13/dotnet-core-common
+git clone https://github.com/onka13/dotnet-common
 ```
 
 ## Contributing

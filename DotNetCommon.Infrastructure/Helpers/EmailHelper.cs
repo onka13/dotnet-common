@@ -133,7 +133,7 @@ namespace DotNetCommon.Infrastructure.Helpers
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                 client.CheckCertificateRevocation = false;
 
-                client.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
+                client.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13;
                 await client.ConnectAsync(config.Server, config.Port, config.UseSsl);
                 await client.AuthenticateAsync(config.User, config.Pass);
                 await client.SendAsync(message);

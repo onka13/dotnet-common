@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel;
 
-namespace DotNetCommon.Infrastructure.Enums
-{
-    public enum AuthenticationScheme
-    {
-        [Description("Basic")]
-        Basic = 0,
+namespace DotNetCommon.Infrastructure.Enums;
 
-        [Description("Bearer")]
-        Bearer = 1,
-    }
+public enum AuthenticationScheme
+{
+    [Description("Basic")]
+    Basic = 0,
+
+    [Description("Bearer")]
+    Bearer = 1,
 }

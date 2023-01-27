@@ -1,9 +1,8 @@
-﻿namespace DotNetCommon.Data.Domain.Models
-{
-    public class BasicAuthModel
-    {
-        public string Username { get; set; }
+﻿namespace DotNetCommon.Data.Domain.Models;
 
-        public string Password { get; set; }
-    }
+public class BasicAuthModel
+{
+    public string Username { get; set; }
+
+    public string Password { get; set; }
 }

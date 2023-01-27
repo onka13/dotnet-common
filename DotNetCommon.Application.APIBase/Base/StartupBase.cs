@@ -11,102 +11,110 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace DotNetCommon.Application.APIBase.Base
+namespace DotNetCommon.Application.APIBase.Base;
+
+/// <summary>
+/// Startup base class.
+/// </summary>
+public abstract class StartupBase
 {
     /// <summary>
-    /// Startup base class.
+    /// Gets or sets iConfiguration object.
     /// </summary>
-    public abstract class StartupBase
+    public IConfiguration Configuration { get; set; }
+
+    /// <summary>
+    /// Gets or sets Environment.
+    /// </summary>
+    public IHostEnvironment Environment { get; set; }
+
+    /// <summary>
+    /// Gets or sets AutofacContainer.
+    /// </summary>
+    public ILifetimeScope AutofacContainer { get; set; }
+
+    /// <summary>
+    /// Gets environment name.
+    /// </summary>
+    /// <param name="env">System environment value.</param>
+    /// <returns>Environment Value.</returns>
+    public abstract string EnvironmentName(string env = null);
+
+    /// <summary>
+    /// Add autofac and default options.
+    /// </summary>
+    /// <param name="services">IServiceCollection object.</param>
+    public virtual void ConfigureServices(IServiceCollection services)
     {
-        /// <summary>
-        /// Gets or sets iConfiguration object.
-        /// </summary>
-        public IConfiguration Configuration { get; set; }
+        services.AddAutofac();
+        services.AddOptions();
+        services.Configure<SmtpConfig>(Configuration.GetSection("Smtp"));
+        services.Configure<AppSettingsConfig>(Configuration.GetSection("AppSettings"));
 
-        /// <summary>
-        /// Gets or sets Environment.
-        /// </summary>
-        public IHostEnvironment Environment { get; set; }
-
-        /// <summary>
-        /// Gets or sets AutofacContainer.
-        /// </summary>
-        public ILifetimeScope AutofacContainer { get; set; }
-
-        public abstract string EnvironmentName(string env);
-
-        /// <summary>
-        /// Add autofac and default options.
-        /// </summary>
-        /// <param name="services">IServiceCollection object.</param>
-        public virtual void ConfigureServices(IServiceCollection services)
+        foreach (var moduleConfig in ModuleHelper.GetModules())
         {
-            services.AddAutofac();
-            services.AddOptions();
-            services.Configure<SmtpConfig>(Configuration.GetSection("Smtp"));
-            services.Configure<AppSettingsConfig>(Configuration.GetSection("AppSettings"));
+            moduleConfig.ConfigureServices(Configuration, services);
+        }
+    }
 
-            foreach (var moduleConfig in ModuleHelper.GetModules())
-            {
-                moduleConfig.ConfigureServices(Configuration, services);
-            }
+    /// <summary>
+    /// Register types and for DbContext.
+    /// </summary>
+    /// <param name="builder">ContainerBuilder object.</param>
+    public virtual void ConfigureContainer(ContainerBuilder builder)
+    {
+        DependencyHelper.RegisterCommonTypes(builder, ModuleHelper.FindAllAssemblies().ToArray());
+
+        foreach (var moduleConfig in ModuleHelper.GetModules())
+        {
+            moduleConfig.ConfigureContainer(builder);
         }
 
-        /// <summary>
-        /// Register types and for DbContext.
-        /// </summary>
-        /// <param name="builder">ContainerBuilder object.</param>
-        public virtual void ConfigureContainer(ContainerBuilder builder)
-        {
-            DependencyHelper.RegisterCommonTypes(builder, ModuleHelper.FindAllAssemblies().ToArray());
+        builder.RegisterType<DbContextManager>()
+                   .AsSelf()
+                   .PropertiesAutowired()
+                   .InstancePerLifetimeScope();
 
-            foreach (var moduleConfig in ModuleHelper.GetModules())
-            {
-                moduleConfig.ConfigureContainer(builder);
-            }
+        builder.RegisterType<LogService>().As<ILogService>().PropertiesAutowired().SingleInstance();
+    }
 
-            builder.RegisterType<DbContextManager>()
-                       .AsSelf()
-                       .PropertiesAutowired()
-                       .InstancePerLifetimeScope();
+    /// <summary>
+    /// Add appsettings files.
+    /// </summary>
+    /// <param name="config">IConfigurationBuilder object.</param>
+    /// <param name="env">IHostEnvironment object.</param>
+    public virtual void Configure(IConfigurationBuilder config, IHostEnvironment env)
+    {
+        Environment = env;
+        config.SetBasePath(AppContext.BaseDirectory);
+        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        config.AddJsonFile($"appsettings.{EnvironmentName(env.EnvironmentName)}.json", optional: true);
+        config.AddJsonFile($"appsettings.overrides.json", optional: true);
+        config.AddJsonFile($"appsettings.local.json", optional: true);
+        config.AddEnvironmentVariables();
 
-            builder.RegisterType<LogService>().As<ILogService>().PropertiesAutowired().SingleInstance();
-        }
+        var settings = config.Build();
+        InjectConfiguration(config, settings);
+    }
 
-        /// <summary>
-        /// Add appsettings files.
-        /// </summary>
-        /// <param name="config">IConfigurationBuilder object.</param>
-        /// <param name="env">IHostEnvironment object.</param>
-        public virtual void Configure(IConfigurationBuilder config, IHostEnvironment env)
-        {
-            Environment = env;
-            config.SetBasePath(AppContext.BaseDirectory);
-            config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            config.AddJsonFile($"appsettings.{EnvironmentName(env.EnvironmentName)}.json", optional: true);
-            config.AddJsonFile($"appsettings.overrides.json", optional: true);
-            config.AddJsonFile($"appsettings.local.json", optional: true);
-            config.AddEnvironmentVariables();
+    /// <summary>
+    /// Adds the final appsetting json.
+    /// </summary>
+    /// <param name="configurationBuilder">IConfigurationBuilder object</param>
+    /// <param name="configuration">IConfigurationRoot object</param>
+    public virtual void InjectConfiguration(IConfigurationBuilder configurationBuilder, IConfigurationRoot configuration)
+    {
+        configurationBuilder.AddJsonFile($"appsettings.final.json", optional: true);
+    }
 
-            var settings = config.Build();
-            InjectConfiguration(config, settings);
-            
-        }
-
-        public virtual void InjectConfiguration(IConfigurationBuilder configurationBuilder, IConfigurationRoot configuration)
-        {
-            configurationBuilder.AddJsonFile($"appsettings.final.json", optional: true);
-        }
-
-        /// <summary>
-        /// Add logging.
-        /// </summary>
-        /// <param name="configuration">IConfiguration object.</param>
-        /// <param name="logging">ILoggingBuilder object.</param>
-        public virtual void ConfigureLogging(IConfiguration configuration, ILoggingBuilder logging)
-        {
-            Configuration = configuration;
-            logging.AddConfiguration(configuration.GetSection("Logging"));
-        }
+    /// <summary>
+    /// Add logging.
+    /// </summary>
+    /// <param name="configuration">IConfiguration object.</param>
+    /// <param name="logging">ILoggingBuilder object.</param>
+    public virtual void ConfigureLogging(IConfiguration configuration, ILoggingBuilder logging)
+    {
+        Configuration = configuration;
+        logging.AddConfiguration(configuration.GetSection("Logging"));
     }
 }
