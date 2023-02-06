@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DotNetCommon.Data.Domain.Business.Queryable;
 
-namespace DotNetCommon.Data.Domain.Business.Transaction;
+namespace DotNetCommon.Data.Domain.Interfaces;
 
 /// <summary>
 /// Repository base interface.

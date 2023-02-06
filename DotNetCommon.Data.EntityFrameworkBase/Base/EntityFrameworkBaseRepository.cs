@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DotNetCommon.Data.Domain.Business;
 using DotNetCommon.Data.Domain.Entitites;
+using DotNetCommon.Data.Domain.Interfaces;
 using DotNetCommon.Data.Domain.Models;
 using DotNetCommon.Data.EntityFrameworkBase.Managers;
 using Microsoft.EntityFrameworkCore;

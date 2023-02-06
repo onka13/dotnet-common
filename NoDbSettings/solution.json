@@ -1,8 +1,8 @@
 {
   "Projects": [
     {
-      "Name": "DotNetCommon.Infra",
-      "Path": "DotNetCommon.Infra",
+      "Name": "DotNetCommon.Infrastructure",
+      "Path": "DotNetCommon.Infrastructure",
       "IsSelected": false
     },
     {
@@ -26,8 +26,8 @@
       "IsSelected": false
     },
     {
-      "Name": "DotNetCommon.Application.API",
-      "Path": "DotNetCommon.Application.API",
+      "Name": "DotNetCommon.Application.APIBase",
+      "Path": "DotNetCommon.Application.APIBase",
       "IsSelected": false
     },
     {
@@ -61,8 +61,13 @@
       "IsSelected": false
     },
     {
-      "Name": "DotNetCommon.VSExtensionLib",
-      "Path": "DotNetCommon.VSExtensionLib",
+      "Name": "DotNetCommon.Data.RedisCache",
+      "Path": "DotNetCommon.Data.RedisCache",
+      "IsSelected": false
+    },
+    {
+      "Name": "DotNetCommon.StripeAPI",
+      "Path": "DotNetCommon.StripeAPI",
       "IsSelected": false
     }
   ]

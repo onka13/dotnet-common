@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DotNetCommon.Data.Domain.Business.Crud;
+namespace DotNetCommon.Data.Domain.Interfaces;
 
 /// <summary>
 /// Repository base interface.

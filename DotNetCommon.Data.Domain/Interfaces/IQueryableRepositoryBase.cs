@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DotNetCommon.Data.Domain.Business.Crud;
 
-namespace DotNetCommon.Data.Domain.Business.Queryable;
+namespace DotNetCommon.Data.Domain.Interfaces;
 
 /// <summary>
 /// Repository base interface.

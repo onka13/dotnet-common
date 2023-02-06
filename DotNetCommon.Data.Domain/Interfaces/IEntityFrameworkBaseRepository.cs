@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using DotNetCommon.Data.Domain.Business.Transaction;
 
-namespace DotNetCommon.Data.EntityFrameworkBase.Base;
+namespace DotNetCommon.Data.Domain.Interfaces;
 
 public interface IEntityFrameworkBaseRepository<TEntity> : ITransactionRepositoryBase<TEntity>
 {

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DotNetCommon.Data.Domain.Business.Queryable;
 
-namespace DotNetCommon.Data.MongoDBBase.Base;
+namespace DotNetCommon.Data.Domain.Interfaces;
 
 public interface IMongoDBBaseRepository<TDocument> : IQueryableRepositoryBase<TDocument>
 {

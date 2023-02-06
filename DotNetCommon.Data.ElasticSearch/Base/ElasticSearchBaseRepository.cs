@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DotNetCommon.Data.Domain.Business;
+using DotNetCommon.Data.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Nest;
 
